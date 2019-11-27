@@ -13,14 +13,24 @@ Within Gogs there are 2 rules:
 Until those 2 rule will hold true, Gogsownz will stay alive.
 """
 
-EXTRA_COOKIES = ['_csrf', 'lang']
+# Some versions have `macaron_flash` in some responses
+EXTRA_COOKIES = ['_csrf', 'lang', 'macaron_flash']
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0'
 }
 
+if True:
+    # For some versions
+    HOOK_UPDATE_ENDPOINT = 'update'
+else:
+    # Other require this or they'll throw a 404
+    HOOK_UPDATE_ENDPOINT = 'pre-receive'
+
+
 class GogsException(Exception):
     pass
+
 
 class Gogs:
     def __init__(self, baseurl, proxy=None, verbosity=0, insecure=False, checktor=False, cookiename=None, windows=False):
@@ -283,7 +293,10 @@ class Gogs:
             'content': command
         }
         self.log(1, "Setting Git hooks")
-        resp = self.post('/{}/{}/settings/hooks/git/update'.format(self.username, repo_name), payload)
+
+        resp = self.post('/{}/{}/settings/hooks/git/{}'.format(
+            self.username, repo_name), payload, HOOK_UPDATE_ENDPOINT)
+
         if self.username not in resp:
             raise GogsException("Can't set Git hooks")
         self.log(1, "Git hooks set sucessfully")
