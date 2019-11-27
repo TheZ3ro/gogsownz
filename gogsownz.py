@@ -295,7 +295,7 @@ class Gogs:
         self.log(1, "Setting Git hooks")
 
         resp = self.post('/{}/{}/settings/hooks/git/{}'.format(
-            self.username, repo_name), payload, HOOK_UPDATE_ENDPOINT)
+            self.username, repo_name, HOOK_UPDATE_ENDPOINT), payload)
 
         if self.username not in resp:
             raise GogsException("Can't set Git hooks")
