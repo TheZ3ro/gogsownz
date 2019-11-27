@@ -83,3 +83,35 @@ https://github.com/gogs/gogs/issues/5558
 https://github.com/gogs/gogs/commit/8c8c37a66b4cef6fc8a995ab1b4fd6e530c49c51  
 https://github.com/gogs/gogs/issues/5599  
 https://2018.zeronights.ru/wp-content/uploads/materials/17-Who-owned-your-code.pdf
+
+### Mitigations
+
+If you take care in setting up your systemd unit file, you'll be pleasantly surprised to see that exploitation is somewhat contained:
+
+```
+[Unit]
+Description=Gogs
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=gogs
+Group=gogs
+WorkingDirectory=/home/gogs/installations/gogs/
+ExecStart=/home/gogs/installations/gogs/gogs web
+Restart=always
+Environment=USER=gogs HOME=/home/gogs
+
+# Some distributions may not support these hardening directives. If you cannot start the service due
+# to an unknown option, comment out the ones not supported by your version of systemd.
+ProtectSystem=full
+PrivateDevices=yes
+PrivateTmp=yes
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+This will at least keep filesystem access contained to an ephemeral filesystem created by systemd. It helps, but you should probably patch the privesc and not give any admin.. obviously
